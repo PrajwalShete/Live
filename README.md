@@ -58,8 +58,15 @@ src/
 
 All GitHub calls go directly from the browser to `api.github.com`
 (CORS-enabled) with `cache: 'no-store'`. Unauthenticated requests are limited
-to **60/hr per IP** — the app surfaces the reset time when you hit it; keep
-auto-refresh modest.
+to **60/hr per IP** — the app surfaces the reset time when you hit it, and:
+
+- Repo metadata is fetched once per page load (shared between views).
+- If the API quota is spent, file content falls back to
+  `raw.githubusercontent.com` with a cache-buster — the Reactor core keeps
+  rendering live content even while rate-limited.
+- Optional: put `VITE_GITHUB_TOKEN=<token>` in `.env.local` (gitignored) for
+  5000/hr during local dev. **Never build/deploy with a token set** — Vite
+  inlines it into the public bundle.
 
 ## Run it
 

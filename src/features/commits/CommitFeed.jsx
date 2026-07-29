@@ -3,6 +3,7 @@ import { getCommits } from '../../lib/github.js';
 import { useGitHub } from '../../hooks/useGitHub.js';
 import { timeAgo } from '../../lib/format.js';
 import { Loader, ErrorState } from '../../components/Feedback.jsx';
+import { RefreshIcon } from '../../components/icons.jsx';
 
 export default function CommitFeed() {
   const fetchCommits = useCallback(() => getCommits(25), []);
@@ -13,13 +14,14 @@ export default function CommitFeed() {
   return (
     <section className="panel">
       <header className="panel-head">
-        <div>
+        <div className="panel-title">
           <h1>Commit feed</h1>
           <p className="panel-sub">The repo's pulse — most recent first.</p>
         </div>
         <div className="panel-actions">
           <button className="btn primary" onClick={refetch} disabled={loading}>
-            ⟳ Refresh
+            <RefreshIcon size={16} />
+            Refresh
           </button>
         </div>
       </header>

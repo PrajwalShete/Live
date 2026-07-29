@@ -2,6 +2,7 @@ import { getRepo } from '../../lib/github.js';
 import { useGitHub } from '../../hooks/useGitHub.js';
 import { compact, timeAgo, fileSize } from '../../lib/format.js';
 import { Loader, ErrorState } from '../../components/Feedback.jsx';
+import { RefreshIcon } from '../../components/icons.jsx';
 
 function StatTile({ label, value, sub }) {
   return (
@@ -22,12 +23,15 @@ export default function StatsPanel() {
   return (
     <section className="panel">
       <header className="panel-head">
-        <div>
+        <div className="panel-title">
           <h1>Repo stats</h1>
           <p className="panel-sub">Vitals for {repo.full_name}, read live.</p>
         </div>
         <div className="panel-actions">
-          <button className="btn primary" onClick={refetch}>⟳ Refresh</button>
+          <button className="btn primary" onClick={refetch}>
+            <RefreshIcon size={16} />
+            Refresh
+          </button>
         </div>
       </header>
 

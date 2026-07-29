@@ -3,10 +3,11 @@ import { getFileText, REPO_URL, BRANCH } from '../../lib/github.js';
 import { useGitHub, useAutoRefresh } from '../../hooks/useGitHub.js';
 import { timeAgo } from '../../lib/format.js';
 import { Loader, ErrorState } from '../../components/Feedback.jsx';
+import { RefreshIcon, ExternalIcon } from '../../components/icons.jsx';
 
 const CONTENT_PATH = 'content/index.html';
 const INTERVALS = [
-  { label: 'Auto-refresh off', value: 0 },
+  { label: 'Auto off', value: 0 },
   { label: 'Every 10s', value: 10_000 },
   { label: 'Every 30s', value: 30_000 },
   { label: 'Every 60s', value: 60_000 },
@@ -23,15 +24,14 @@ export default function LiveRenderer() {
   return (
     <section className="panel">
       <header className="panel-head">
-        <div>
+        <div className="panel-title">
           <h1>Reactor core</h1>
           <p className="panel-sub">
-            Rendering <code>{CONTENT_PATH}</code> straight from GitHub — edit it,{' '}
-            push, refresh.
+            <code>{CONTENT_PATH}</code> rendered straight from GitHub
+            {lastSync && <span className="sync-note"> · synced {timeAgo(lastSync.toISOString())}</span>}
           </p>
         </div>
         <div className="panel-actions">
-          <span className="sync-note">{lastSync ? `synced ${timeAgo(lastSync.toISOString())}` : ''}</span>
           <select
             className="select"
             value={interval}
@@ -42,19 +42,22 @@ export default function LiveRenderer() {
               <option key={i.value} value={i.value}>{i.label}</option>
             ))}
           </select>
-          <button className="btn ghost" onClick={() => setShowSource((s) => !s)}>
+          <button className="btn" onClick={() => setShowSource((s) => !s)}>
             {showSource ? 'Rendered' : 'Source'}
           </button>
           <a
-            className="btn ghost"
+            className="btn icon-btn"
             href={`${REPO_URL}/edit/${BRANCH}/${CONTENT_PATH}`}
             target="_blank"
             rel="noreferrer"
+            aria-label="Edit on GitHub"
+            title="Edit on GitHub"
           >
-            Edit on GitHub ↗
+            <ExternalIcon size={16} />
           </a>
           <button className="btn primary" onClick={refetch} disabled={loading}>
-            {loading ? 'Syncing…' : '⟳ Refresh'}
+            <RefreshIcon size={16} className={loading ? 'spin' : undefined} />
+            Refresh
           </button>
         </div>
       </header>
@@ -66,14 +69,12 @@ export default function LiveRenderer() {
       ) : showSource ? (
         <pre className="code-view"><code>{html}</code></pre>
       ) : (
-        <div className="render-frame-wrap">
-          <iframe
-            className="render-frame"
-            title="Live repo content"
-            sandbox="allow-popups"
-            srcDoc={html}
-          />
-        </div>
+        <iframe
+          className="render-frame"
+          title="Live repo content"
+          sandbox="allow-popups"
+          srcDoc={html}
+        />
       )}
     </section>
   );

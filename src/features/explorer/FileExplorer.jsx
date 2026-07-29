@@ -3,8 +3,10 @@ import { getTree, getFileText, REPO_URL, BRANCH } from '../../lib/github.js';
 import { useGitHub } from '../../hooks/useGitHub.js';
 import { fileSize } from '../../lib/format.js';
 import { Loader, ErrorState } from '../../components/Feedback.jsx';
+import { RefreshIcon, ExternalIcon, SearchIcon } from '../../components/icons.jsx';
 
-const TEXT_EXT = /\.(html?|css|js|jsx|ts|tsx|json|md|txt|yml|yaml|svg|gitignore)$/i;
+const TEXT_EXT =
+  /(\.(html?|css|js|jsx|ts|tsx|json|md|txt|yml|yaml|svg|py|rb|go|rs|sh|toml|xml|lock|webmanifest|env|cfg|ini)|\/?\.[a-z]+ignore|\/?\.[a-z]+rc)$/i;
 
 function FileViewer({ path }) {
   const fetchFile = useCallback(() => getFileText(path), [path]);
@@ -21,12 +23,19 @@ function FileViewer({ path }) {
         <code className="viewer-path">{path}</code>
         <div className="viewer-actions">
           {isHtml && (
-            <button className="btn ghost" onClick={() => setRender((r) => !r)}>
+            <button className="btn" onClick={() => setRender((r) => !r)}>
               {render ? 'Source' : 'Render'}
             </button>
           )}
-          <a className="btn ghost" href={`${REPO_URL}/blob/${BRANCH}/${path}`} target="_blank" rel="noreferrer">
-            GitHub ↗
+          <a
+            className="btn icon-btn"
+            href={`${REPO_URL}/blob/${BRANCH}/${path}`}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open on GitHub"
+            title="Open on GitHub"
+          >
+            <ExternalIcon size={16} />
           </a>
         </div>
       </div>
@@ -53,19 +62,22 @@ export default function FileExplorer() {
   return (
     <section className="panel">
       <header className="panel-head">
-        <div>
+        <div className="panel-title">
           <h1>File explorer</h1>
-          <p className="panel-sub">Live tree of the repo — click a file to open it.</p>
+          <p className="panel-sub">Live tree of the repo — tap a file to open it.</p>
         </div>
         <div className="panel-actions">
-          <input
-            className="input"
-            placeholder="Filter files…"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-          <button className="btn primary" onClick={refetch} disabled={loading}>
-            ⟳ Refresh
+          <label className="search-box">
+            <SearchIcon size={15} />
+            <input
+              className="search-input"
+              placeholder="Filter files"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </label>
+          <button className="btn primary" onClick={refetch} disabled={loading} aria-label="Refresh">
+            <RefreshIcon size={16} />
           </button>
         </div>
       </header>
@@ -97,7 +109,7 @@ export default function FileExplorer() {
           {selected ? (
             <FileViewer path={selected} />
           ) : (
-            <p className="empty-note">Select a file to inspect it.</p>
+            <div className="empty-pane">Select a file to inspect it.</div>
           )}
         </div>
       </div>

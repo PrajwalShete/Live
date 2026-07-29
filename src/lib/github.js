@@ -5,12 +5,16 @@ export const REPO = 'PrajwalShete/Live';
 export const BRANCH = 'main';
 export const REPO_URL = `https://github.com/${REPO}`;
 
-const API = 'https://api.github.com';
+// API base. Defaults to GitHub direct (unauthenticated, 60/hr per visitor IP).
+// In production, point VITE_API_BASE at the CloudFront distribution that
+// injects the Authorization header server-side — that value is just a URL,
+// not a secret, so it is safe to set as a normal build env var.
+const API = import.meta.env.VITE_API_BASE || 'https://api.github.com';
 const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
 
-// Optional auth (60/hr → 5000/hr): set VITE_GITHUB_TOKEN in .env.local for
-// local dev, or drop a token in localStorage under "reactor-hub:token".
-// Never ship a token in a deployed build — the bundle is public.
+// Local-dev convenience only: a token in .env.local or localStorage. Never
+// set VITE_GITHUB_TOKEN in a deployed build — Vite inlines it into the
+// public bundle. Production auth belongs in the CloudFront origin header.
 const TOKEN =
   import.meta.env.VITE_GITHUB_TOKEN ||
   (typeof localStorage !== 'undefined' && localStorage.getItem('reactor-hub:token')) ||

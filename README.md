@@ -65,8 +65,31 @@ to **60/hr per IP** — the app surfaces the reset time when you hit it, and:
   `raw.githubusercontent.com` with a cache-buster — the Reactor core keeps
   rendering live content even while rate-limited.
 - Optional: put `VITE_GITHUB_TOKEN=<token>` in `.env.local` (gitignored) for
-  5000/hr during local dev. **Never build/deploy with a token set** — Vite
-  inlines it into the public bundle.
+  5000/hr during **local dev only**. **Never build/deploy with a token set** —
+  Vite inlines it into the public bundle. See § Deploying.
+
+The 60/hr limit is **per source IP**, and every fetch runs in the visitor's
+own browser — so each visitor gets their own budget rather than sharing one.
+A deployed instance does not need a token to serve many users.
+
+## Deploying
+
+Deploys as a static site (`amplify.yml` included for AWS Amplify).
+
+**Do not put a GitHub token in Amplify environment variables.** Amplify env
+vars are build-time vars, and Vite inlines any `VITE_*` value directly into
+the JavaScript bundle it ships to browsers — the token would be readable by
+anyone who opens devtools. Verified: building with a canary token emits
+`up="ghp_…"` in plain text inside `dist/assets/index-*.js`.
+
+If you genuinely need authenticated rate limits in production, the token has
+to stay server-side: put a small serverless function (Amplify function,
+Lambda, or a Cloudflare Worker) in front of the GitHub API, keep the token in
+*its* environment, and point `lib/github.js` at that endpoint instead of
+`api.github.com`.
+
+After each deploy, bump `CACHE` in `public/sw.js` if you change the shell —
+navigations are network-first, so pages self-heal, but it evicts stale assets.
 
 ## Run it
 

@@ -2,7 +2,7 @@ const http = require('http');
 
 const REPO = 'PrajwalShete/Live';
 const FILE = 'index.html';
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(async (req, res) => {
   try {

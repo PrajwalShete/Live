@@ -72,7 +72,7 @@ export default function LiveRenderer() {
         <iframe
           className="render-frame"
           title="Live repo content"
-          sandbox="allow-popups"
+          sandbox="allow-scripts allow-popups"
           srcDoc={html}
         />
       )}
